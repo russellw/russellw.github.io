@@ -1,2 +1,0 @@
-# russellw.github.io
-Blog
