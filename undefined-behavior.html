@@ -44,9 +44,6 @@ section {
     margin: 0 3em;
     flex: 0 0 72ch;
 }
-nav {
-    margin: 1em 3em;
-}
 @media (width < 1000px) {
     main {
         display: block;
@@ -54,71 +51,8 @@ nav {
     section {
         margin: 0;
     }
-    nav {
-        display: none;
-    }
-}
-.menuItem {
-    color: #fff;
-    text-decoration: none;
-    padding: .5em 1em;
-    display: inline-block;
-}
-#menu a:hover {
-    background-color: #666;
-}
-#burger {
-    display: none;
-}
-#burgerMenu {
-    display: none;
-    position: absolute;
-    margin-right: 0;
-    right: .45em;
-    background-color: #333;
-}
-#burgerMenu a {
-    color: #fff;
-    padding: .5em 1em;
-    text-decoration: none;
-    display: block;
-}
-@media (width < 1000px) {
-    #menu {
-        display: none;
-    }
-    #burger {
-        display: inline-block;
-    }
 }
 </style>
-
-<script>
-function toggleBurger() {
-    var c = document.getElementById("burgerMenu")
-    if (c.style.display === "block")
-        c.style.display = "none"
-    else
-        c.style.display = "block"
-}
-</script>
-
-<header style='background-color: #333; color: #fff; display: flex;'>
-    <a class='menuItem' style='flex:3; font-weight: bold;' href='/'>Lumagraph</a>
-    <div id='menu' style='flex:2;'>
-        <a class='menuItem' style='margin-right: 2em' href='about'>About</a>
-        <a class='menuItem' style='margin-right: 2em' href='blog'>Blog</a>
-        <a class='menuItem' href='mailto:russell@lumagraph.ie?subject=Inquiry'>Contact</a>
-    </div>
-    <div style='padding: .5em 1em;' id="burger" onclick="toggleBurger()">
-        &#9776;
-        <nav id="burgerMenu">
-            <a href="about">About</a>
-            <a href="blog">Blog</a>
-            <a href="mailto:russell@lumagraph.ie?subject=Inquiry">Contact</a>
-        </nav>
-    </div>
-</header>
 
 <main>
 <section>
@@ -607,6 +541,3 @@ This is usually not a viable option, simply because projects for which it was, h
 Still, automatic memory management is sometimes more affordable than it looked at first glance, and when it's not, there are other languages that don't need it. (At the time of writing, the most available, understood and proven are Fortran for numbercrunching, Ada and Rust for general code, Wuffs as a domain-specific language for <q>wrangling untrusted file formats safely</q>.) There are times when the option of using one of them should be on the table, so I list it for completeness.
 </section>
 </main>
-<footer style='font-size: 0.75em; grid-area: footer; margin-top: 1em; opacity: 0.5; text-align: center;'>
-&copy; 2024 Russell Wallace
-</footer>
