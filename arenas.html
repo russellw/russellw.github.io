@@ -75,7 +75,7 @@ And they are tricky in Rust because the language is founded on the idea that mem
 There are several ways to solve this problem. One way is to avoid using direct references to the particular class of objects at all. Instead, allocate a big array of objects, and refer to them with integer indexes into that array. There are several names that have been used for such arrays and indexes; let's call them arenas and handles.
 
 <p>
-At this point, smart programmers will spot what's going on. Essentially you are bypassing the notion of pointers provided directly by the hardware, only to reimplement your own address space, and your own notion of pointers within it. The next step of course is to write your own versions of malloc and free to allocate and deallocate objects within the arena.
+At this point, smart programmers will spot what's going on. Essentially you are bypassing the notion of pointers provided directly by the hardware, only to reimplement your own address space, and your own notion of pointers within it. The next step of course is to write your own equivalents of <code>malloc</code> and <code>free</code> to allocate and deallocate objects within the arena.
 
 <p>
 Doesn't that mean you are throwing out all the memory safety properties you were hoping to achieve by using Rust in the first place? Wouldn't you be as well off to just go back to C and at least be honest about the fact that you have reverted to purely manual memory management?
