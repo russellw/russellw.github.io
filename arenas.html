@@ -2,8 +2,8 @@
 <html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="canonical" href="undefined-behavior">
-<title>Undefined behavior in C and C++</title>
+<link rel="canonical" href="arenas">
+<title>Arenas in Rust</title>
 
 <style>
 body {
@@ -64,7 +64,7 @@ At one level, this question is not very fair, because an answer to it as stated 
 At another level, it is fair because it is a simple, familiar proxy for all data structures with any kind of circular references. Consider a compiler holding a set of modules that may refer to each other. Or a game where objects may refer to their container. Or a graphic user interface where widgets may refer to a parent window. It might be reasonable to say some particular such structure is not the best solution in some particular case, but it is not reasonable to say that about all such structures in all cases.
 
 <p>
-And they are tricky in Rust because the language is founded on the idea that memory management should in general, be done by ownership. Essentially, Rust is an answer to the question, what happens if you start with C++ and encode the common ownership/RAII design patterns into the type system so fallible human brains don't need to enforce them. (And while we're at it, drop some of the legacy C baggage. And sprinkle in some features from ML family languages. And… okay, it's never really just one thing. But memory management is the focus here.) Circular references don't necessarily break ownership, but they do break the ability of the type system to keep track of it.
+And they are tricky in Rust because the language is founded on the idea that memory management should in general, be done by ownership. Essentially, Rust is an answer to the question, what happens if you start with C++ and encode the common ownership/RAII design patterns into the type system so fallible human brains don't need to enforce them. (And while we're at it, drop some of the legacy C baggage. And sprinkle in some features from ML family languages. And... okay, it's never really just one thing. But memory management is the focus here.) Circular references don't necessarily break ownership, but they do break the ability of the type system to keep track of it.
 
 <p>
 There are several ways to solve this problem. One way is to avoid using direct references to the particular class of objects at all. Instead, allocate a big array of objects, and refer to them with integer indexes into that array. There are several names that have been used for such arrays and indexes; let's call them arenas and handles.
@@ -76,7 +76,7 @@ At this point, smart programmers will spot what's going on. Essentially you are 
 Doesn't that mean you are throwing out all the memory safety properties you were hoping to achieve by using Rust in the first place? Wouldn't you be as well off to just go back to C and at least be honest about the fact that you have reverted to purely manual memory management?
 
 <p>
-That argument looks right at first glance, but it's actually not.
+That argument sounds logical, but it's not actually correct.
 
 <p>
 Consider: why were we so scared of memory unsafety in the first place? What's so bad about memory safety bugs that it was considered worth inventing a whole new language to fix them? (Yes, as I mentioned earlier, Rust has some other nice properties, but those would not have sufficed to drive a movement to replace C++ with a new language. They are bonuses. Memory safety was the driving force behind Rust.)
