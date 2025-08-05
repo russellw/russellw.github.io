@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="canonical" href="undefined-behavior">
+<title>Undefined behavior in C and C++</title>
+
+<style>
+body {
+    font-family: Arial,sans-serif;
+    font-size: 18px;
+    line-height: 1.4;
+}
+
+h1 {
+    margin-bottom: .5em;
+}
+h2 {
+    margin-bottom: .5em;
+}
+h3 {
+    margin-bottom: .5em;
+}
+
+figcaption {
+    font-size: .75em;
+}
+img {
+    width: 100%;
+}
+
+pre {
+    white-space: pre-wrap;
+}
+
+main {
+    display: flex;
+}
+section {
+    margin: 0 3em;
+    flex: 0 0 72ch;
+}
+@media (width < 1000px) {
+    main {
+        display: block;
+    }
+    section {
+        margin: 0;
+    }
+}
+</style>
+
+<main>
+<section>
+<h1>Arenas in Rust</h1>
+August 5, 2025
+
+A fast way to start a heated argument in a room full of programmers: “How do you implement a doubly linked list in Rust?”
+
+<p>
+At one level, this question is not very fair, because an answer to it as stated would be that one simply does not use doubly linked lists. They have been popular in introductory computer science lectures because they are a neat way to explain pointers in a data structure that's easy to draw on a whiteboard, but they are not a good match to modern hardware. The last time I used one was in the nineties. I know the Linux kernel uses them, but that design was also laid down in the nineties; if you were designing a kernel from scratch today, you would probably not do it that way.
+
+<p>
+At another level, it is fair because it is a simple, familiar proxy for all data structures with any kind of circular references. Consider a compiler holding a set of modules that may refer to each other. Or a game where objects may refer to their container. Or a graphic user interface where widgets may refer to a parent window. It might be reasonable to say some particular such structure is not the best solution in some particular case, but it is not reasonable to say that about all such structures in all cases.
+
+<p>
+And they are tricky in Rust because the language is founded on the idea that memory management should in general, be done by ownership. Essentially, Rust is an answer to the question, what happens if you start with C++ and encode the common ownership/RAII design patterns into the type system so fallible human brains don't need to enforce them. (And while we're at it, drop some of the legacy C baggage. And sprinkle in some features from ML family languages. And… okay, it's never really just one thing. But memory management is the focus here.) Circular references don't necessarily break ownership, but they do break the ability of the type system to keep track of it.
+
+<p>
+There are several ways to solve this problem. One way is to avoid using direct references to the particular class of objects at all. Instead, allocate a big array of objects, and refer to them with integer indexes into that array. There are several names that have been used for such arrays and indexes; let's call them arenas and handles.
+
+<p>
+At this point, smart programmers will spot what's going on. Essentially you are bypassing the notion of pointers provided directly by the hardware, only to reimplement your own address space, and your own notion of pointers within it. The next step of course is to write your own versions of malloc and free to allocate and deallocate objects within the arena.
+
+<p>
+Doesn't that mean you are throwing out all the memory safety properties you were hoping to achieve by using Rust in the first place? Wouldn't you be as well off to just go back to C and at least be honest about the fact that you have reverted to purely manual memory management?
+
+<p>
+That argument looks right at first glance, but it's actually not.
+
+<p>
+Consider: why were we so scared of memory unsafety in the first place? What's so bad about memory safety bugs that it was considered worth inventing a whole new language to fix them? (Yes, as I mentioned earlier, Rust has some other nice properties, but those would not have sufficed to drive a movement to replace C++ with a new language. They are bonuses. Memory safety was the driving force behind Rust.)
+
+<p>
+Memory safety bugs have two properties that make them scarier than most other kinds.
+
+<h2>Nondeterminism</h2>
+
+An array overflow, or use after free, is likely to manifest as an intermittent crash with no clear connection to the cause. Try to reproduce the problem in a debug build, maybe it goes away. Recompile with a couple of extra logging statements, maybe the crash goes away. Rerun the same binary with the same inputs, and thanks to ASLR, maybe the crash goes away. Maybe one day it shows a minute after the triggering cause, maybe another day it shows an hour after, or not at all. 
+
+<p>
+Handles are deterministic. If a bug made your program crash on the last run, it will crash the same way on this run.
+
+<h2>Security</h2>
+
+This one is even bigger.
+
+<p>
+If there exists an input that will cause a given C program to crash with a segmentation fault, what's the probability there exists another input that will allow remote code execution? In practice, the answer tends to be high, more than even expert intuition started off expecting.
+
+<p>
+And if the program is, say, a web browser, that can be bad. (It's not a coincidence Rust was invented by a browser company.)
+
+<p>
+There was a time you could say, okay but that only applies to the special category of security-critical programs. But these days (setting aside little scripts for personal use, assuming we are talking about published software), it's programs that don't have to cope with adversarial input, that are the special and shrinking category. This is true even of embedded systems; it's rare nowadays to find a smart device that doesn't expect to be connected to the Internet.
+
+<p>
+Given that the arena will still be subject to array bounds checking, handle bugs won't allow an attacker to overwrite arbitrary memory the way pointer bugs do. So using handles for your memory management, preserves the property, that bugs in your Rust code may lead to denial of service, but they are much less likely to lead to remote code execution.
+
+<p>
+And that is why, though arena memory management is isomorphic to old-fashioned manual memory management, it does not keep the particularly bad failure modes that motivated the move to Rust in the first place.
